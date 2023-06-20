@@ -50,8 +50,8 @@ return_img = pygame.image.load("Assets/return.png")
 
 close_btn = Button(close_img, (24, 24), WIDTH // 4 - 18, HEIGHT//2 + 120)
 replay_btn = Button(replay_img, (36,36), WIDTH // 2  - 18, HEIGHT//2 + 115)
-difficult_btn = Button(difficult_img, (36, 36), 0, 20)
-
+difficult_btn = Button(difficult_img, (48, 48), WIDTH - WIDTH // 4 - 18, HEIGHT//2 + 110)
+start_btn = Button(start_img, (36,36), WIDTH // 2  - 18, HEIGHT//2 + 115)
 return_btn = Button(return_img, (36, 36), 10, 40)
 
 #font game 
@@ -109,12 +109,29 @@ score = 0
 points = [0, 0, 0, 0, 0, 0]
 points_pos = []
 game_over = False
-high_score = 0
 divide_point = 1200
+high_score = 0
+element_score = 1
 
 #Thiết lập các biến đại diện cho các màn hình
 home_page = True
 difficult_page = False
+select_song_page = False
 option_page = False
 sound_page = False
 game_page = False
+
+#
+COLOR_INACTIVE = (100, 80, 255)
+COLOR_ACTIVE = (100, 200, 255)
+COLOR_LIST_INACTIVE = (255, 100, 100)
+COLOR_LIST_ACTIVE = (255, 150, 150)
+
+file_path = "./SongNameList.txt"  # Replace with the actual path to your file
+
+lines = []
+
+with open(file_path, "r") as file:
+    for line in file:
+        line = line.strip()  # Remove leading/trailing whitespaces
+        lines.append(line)

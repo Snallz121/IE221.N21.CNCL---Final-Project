@@ -5,7 +5,22 @@ from utils import write_save
 WIDTH = 432
 HEIGHT = 768
 Screen_Size = (WIDTH, HEIGHT)
+"""
+Lớp Controls_Handler để quản lý các nút trên bàn phím, xử lí các sự kiện liên quan tới các nút trên bàn phím
 
+Phương thức khởi tạo init nhận tham số đầu vào là dữ liệu từ file json
+
+
+-Phương thức update để cập nhật lại sau mỗi lần một event được thực thi
+-Phương thức render để vẽ giao diện lên màn hình
+-Phương thức navigate menu giúp ta di chuyển thanh đánh dấu và chọn mục ta muốn chọn
+-Phương thức set_new_control dùng để thay thế phím sẽ được dùng để tương tác trong trò chơi, 
+ngoài ra nó còn ngăn sẽ không có phím nào trùng lặp trong trò chơi 
+- Phương thức display_control vẽ lên màn hình các cài đặt của phím điều khiển hiện tại
+- Phương thức setup thiết lập các cài đặt ban đầu cho đối tượng
+- Phương thức draw_text giúp vẽ và thiết lập các tương tác của chữ lên giao diện
+
+"""
 class Controls_Handler:
     def __init__(self, save):
         self.save_file = save
@@ -79,3 +94,53 @@ class Controls_Handler:
         text_rect = text_surface.get_rect()
         text_rect.center = (x, y)
         surface.blit(text_surface, text_rect)
+
+class DropDown():
+
+    def __init__(self, color_menu, color_option, x, y, w, h, font, main, options):
+        self.color_menu = color_menu
+        self.color_option = color_option
+        self.rect = pygame.Rect(x, y, w, h)
+        self.font = font
+        self.main = main
+        self.options = options
+        self.draw_menu = False
+        self.menu_active = False
+        self.active_option = -1
+
+    def draw(self, surf):
+        pygame.draw.rect(surf, self.color_menu[self.menu_active], self.rect, 0)
+        msg = self.font.render(self.main, 1, (0, 0, 0))
+        surf.blit(msg, msg.get_rect(center = self.rect.center))
+
+        if self.draw_menu:
+            for i, text in enumerate(self.options):
+                rect = self.rect.copy()
+                rect.y += (i+1) * self.rect.height
+                pygame.draw.rect(surf, self.color_option[1 if i == self.active_option else 0], rect, 0)
+                msg = self.font.render(text, 1, (0, 0, 0))
+                surf.blit(msg, msg.get_rect(center = rect.center))
+
+    def update(self, event_list):
+        mpos = pygame.mouse.get_pos()
+        self.menu_active = self.rect.collidepoint(mpos)
+        
+        self.active_option = -1
+        for i in range(len(self.options)):
+            rect = self.rect.copy()
+            rect.y += (i+1) * self.rect.height
+            if rect.collidepoint(mpos):
+                self.active_option = i
+                break
+
+        if not self.menu_active and self.active_option == -1:
+            self.draw_menu = False
+
+        for event in event_list:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.menu_active:
+                    self.draw_menu = not self.draw_menu
+                elif self.draw_menu and self.active_option >= 0:
+                    self.draw_menu = False
+                    return self.active_option
+        return -1

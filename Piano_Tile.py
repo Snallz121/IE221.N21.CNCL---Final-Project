@@ -6,15 +6,16 @@ from Game_Object import *
 from Game_Define_Variable import *
 import os
 from utils import load_save, reset_keys
-from controls import Controls_Handler
+from controls import Controls_Handler, DropDown
+pygame.init() # Khoi chay game
 
 actions = {"Col1": False, "Col2": False, "Col3": False, "Col4": False, "Col5": False, "Col6": False, 'Up': False, 'Down': False, 'Action1': False} 
 save = load_save()
 control_handler = Controls_Handler(save)
 canvas = pygame.Surface(Screen_Size)
+high_score = 0
 
 COLORCHRG = WHITE
-pygame.init() # Khoi chay game
 
 #Thiet lap game
 t = Tile(10, 10, game_window)
@@ -22,8 +23,27 @@ x = random.randint(0, 5)
 t = Tile(x * TILE_WIDTH, -TILE_HEIGHT, game_window)
 tile_group.add(t)
 pos = None #Khoi tao vi tri con chuot vua click
+list1 = DropDown(
+    [COLOR_INACTIVE, COLOR_ACTIVE],
+    [COLOR_LIST_INACTIVE, COLOR_LIST_ACTIVE],
+    20, 50, 400, 80, 
+    pygame.font.SysFont(None, 30), 
+    None, lines)
 #Vòng lặp của Game
 running = True
+
+
+
+
+
+
+
+
+
+
+
+
+
 while running:
     pos = None
 
@@ -43,19 +63,25 @@ while running:
     như thiết lập độ khó 
     """
     all_keys = pygame.key.get_pressed()
-
     if all_keys[pygame.K_F4] and (all_keys[pygame.K_LCTRL] or all_keys[pygame.K_RCTRL]):
         running = False
         sys.exit()
-    for event in pygame.event.get():
+    
+    event_list = pygame.event.get()
+    for event in event_list:
         if event.type == pygame.QUIT:
             running = False
             sys.exit()
 
         if event.type == pygame.KEYDOWN :
-            if event.key == pygame.K_ESCAPE or event.key == pygame.K_q:
-                running = False
-                sys.exit() 
+            if event.key == pygame.K_ESCAPE:
+                if(option_page):
+                    option_page = False
+                    home_page = True
+                elif(difficult_page):
+                    home_page = True
+                    difficult_page = False
+
             if event.key == control_handler.controls['Col1']:
                 pos = points_pos[0]
                 if not music_flag:
@@ -119,8 +145,22 @@ while running:
             if event.key == control_handler.controls['Action1']:
                 actions['Action1'] = False
         
-        if event.type == pygame.MOUSEBUTTONDOWN and game_page == False:
+        if event.type == pygame.MOUSEBUTTONDOWN and game_page == False and select_song_page == False:
             pos = event.pos
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # if(pos == None):
     #     pass
@@ -166,33 +206,39 @@ while running:
                 running = False
                 sys.exit()
             pos = None
+
+
+
+
+
+
     elif difficult_page:
         game_window.blit(bg2_img, (0,0)) # Thiết lập background cho game
 
-        t0 = score_font.render('Easy', True, COLORCHRG)
+        t0 = score_font.render('Easy', True, (255,0,0))
         game_window.blit(t0, (WIDTH // 2 - 25, HEIGHT // 2 - 150))
         text_x = WIDTH // 2 - 25
         text_y = HEIGHT // 2 - 150
         t0_rect = t0.get_rect()
         t0_rect.center = (text_x + t0.get_width() // 2, text_y + t0.get_height() // 2)
 
-        t1 = score_font.render('Normal', True, COLORCHRG)
+        t1 = score_font.render('Normal', True, (0,255,0))
         game_window.blit(t1, (WIDTH // 2 - 40, HEIGHT // 2 - 90))
         text_x = WIDTH // 2 - 40
         text_y = HEIGHT // 2 - 90
         t1_rect = t1.get_rect()
         t1_rect.center = (text_x + t1.get_width() // 2, text_y + t1.get_height() // 2)
 
-        t2 = score_font.render('Insane', True, COLORCHRG)
+        t2 = score_font.render('Insane', True, (0,0,255))
         game_window.blit(t2, (WIDTH // 2 - 35, HEIGHT // 2 - 30))
         text_x = WIDTH // 2 - 35
         text_y = HEIGHT // 2 - 30
         t2_rect = t2.get_rect()
         t2_rect.center = (text_x + t2.get_width() // 2, text_y + t2.get_height() // 2)
 
-        t3 = score_font.render('Return', True, COLORCHRG)
-        game_window.blit(t3, (WIDTH // 2 - 35, HEIGHT // 2 + 30))
-        text_x = WIDTH // 2 - 35
+        t3 = score_font.render('Return to main menu', True, (255,255,0))
+        game_window.blit(t3, (WIDTH // 2 - 100, HEIGHT // 2 + 30))
+        text_x = WIDTH // 2 - 100
         text_y = HEIGHT // 2 + 30
         t3_rect = t3.get_rect()
         t3_rect.center = (text_x + t3.get_width() // 2, text_y + t3.get_height() // 2)
@@ -201,10 +247,13 @@ while running:
         else:
             if t0_rect.collidepoint(pos[0], pos[1]) and pygame.mouse.get_pressed()[0]:
                 divide_point = 1200
+                element_score = 1
             if t1_rect.collidepoint(pos[0], pos[1]) and pygame.mouse.get_pressed()[0]:
-                divide_point = 900
+                element_score = 2
+                divide_point = 800
             if t2_rect.collidepoint(pos[0], pos[1]) and pygame.mouse.get_pressed()[0]:
-                divide_point = 500
+                element_score = 4
+                divide_point = 400
             if t3_rect.collidepoint(pos[0], pos[1]) and pygame.mouse.get_pressed()[0]:
                 home_page = True
                 difficult_page = False
@@ -212,21 +261,51 @@ while running:
             if(home_page):
                 pass
             else:
-                game_page = True 
+                select_song_page = True 
                 difficult_page = False
                 x = random.randint(0, 5)
                 t = Tile(x * TILE_WIDTH, -TILE_HEIGHT, game_window)
                 tile_group.add(t)
+    
+    
+    
+    
+    
+    elif select_song_page:
+        game_window.blit(bg2_img, (0,0)) # Thiết lập background cho game
+        selected_option = list1.update(event_list)
+        if selected_option >= 0:
+            list1.main = list1.options[selected_option]
+        list1.draw(game_window)
+        if list1.main != None:
+            if start_btn.draw(game_window):
+                game_page = True
+                select_song_page = False
+    
+    
+    
+    
+    
     elif option_page:
-        canvas.fill((135, 206, 235))
+        canvas = bg2_img.copy()
         control_handler.render(canvas)
         game_window.blit(pygame.transform.scale(canvas, (Screen_Size[0] * 2,Screen_Size[1] * 2) ), (0,0))
         if return_btn.draw(game_window):
             home_page = True
             option_page = False
-            
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     elif game_page:
-        game_window.blit(Background_image, (0,0)) # Thiết lập background cho game
+        game_window.blit(bg2_img, (0,0)) # Thiết lập background cho game
         endPointCoordinate = draw_bar(game_window, WIDTH, 2, 7, points) # xác định breakpoint và vẽ các điểm tròn
         """
         Vẽ các kí tự A,S,D,J,K,L ứng với các nút bấm của điểm tròn
@@ -251,9 +330,9 @@ while running:
             if pos:
                 if tile.rect.collidepoint(pos):
                     tile.alive = False
-                    score += 1
+                    score += element_score
                     pos = None
-                    if( high_score > score):
+                    if( high_score < score):
                         high_score = score 
 
             if (tile.rect.top >= endPointCoordinate) and tile.alive:
@@ -308,6 +387,9 @@ while running:
                 tile_group.empty()
                 score = 0
                 speed = 2
+    
+    
+    
     control_handler.update(actions)            
     clock.tick(FPS)
     pygame.display.update()
