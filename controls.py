@@ -95,6 +95,19 @@ class Controls_Handler:
         text_rect.center = (x, y)
         surface.blit(text_surface, text_rect)
 
+"""
+Lớp Dropdown để vẽ lên màn hình hộp bài hát mà người chơi có thể chọn bài hát từ hộp đó và bắt đầu trò chơi
+
+Tham số đầu vào gồm danh sách màu, màu được chọn, tọa độ x, y của hộp và chiều rộng,chiều dài của control,
+font chữ của văn bản sử dụng trong hộp, cuối cùng là main để khởi tạo giá trị hiển thị mặc định của control
+và options là 1 list chứa các đối tượng sẽ được dùng để lựa chọn trong controls
+
+- Phương thức:
+Hàm __init__ để khởi tạo đối tượng
+Hàm draw cho phép vẽ và hiển thị đối tượng lên màn hình
+Phương thức update cho phép đối tượng được cập nhật lại giao diện sau mỗi event,
+đồng thời xử lí các event diễn ra trong đối tượng như việ người dùng chọn nội dung trong controls 
+"""
 class DropDown():
 
     def __init__(self, color_menu, color_option, x, y, w, h, font, main, options):
